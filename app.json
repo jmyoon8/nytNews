@@ -1,12 +1,11 @@
 {
-  "name": "sumGo",
-  "displayName": "sumGo",
   "expo": {
-    "name": "sumGo",
-    "slug": "sumGo",
+    "name": "mySumgo",
+    "slug": "mySumgo",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
     ]
-  }
+  },
+  "name": "mySumgo"
 }
