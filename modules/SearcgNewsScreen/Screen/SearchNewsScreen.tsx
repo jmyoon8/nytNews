@@ -14,6 +14,7 @@ import _ from "lodash";
 import ArticleComponent from "../Components/ArticleComponent";
 import ArticleWebViewModal from "../Components/ArticleWebViewModal";
 import ArticleList from "../Components/ArticleList";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const styles = StyleSheet.create({
   container: {
@@ -112,8 +113,11 @@ const SearchNewsScreen = () => {
       debounceHandler(keyWord, page, true);
     }
   }, [page]);
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { paddingTop: useSafeAreaInsets().top + 10 }]}
+    >
       <Text style={styles.title}>숨은 뉴스</Text>
       <View style={styles.welcomeTextContainer}>
         <Text style={styles.welcomeText}>어떤 뉴스를</Text>

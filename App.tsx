@@ -11,7 +11,7 @@ import Icon from "react-native-vector-icons/AntDesign";
 export default function App() {
   return (
     <NavigationContainer>
-      <MainTab.Navigator>
+      <MainTab.Navigator screenOptions={{ headerShown: false }}>
         <MainTab.Screen
           name="SearchNews"
           component={SearchNewsScreen}
