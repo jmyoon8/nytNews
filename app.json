@@ -1,11 +1,4 @@
 {
-  "expo": {
-    "name": "mySumgo",
-    "slug": "mySumgo",
-    "version": "1.0.0",
-    "assetBundlePatterns": [
-      "**/*"
-    ]
-  },
-  "name": "mySumgo"
+  "name": "SearchNYT",
+  "displayName": "SearchNYT"
 }
