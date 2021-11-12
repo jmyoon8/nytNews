@@ -1,151 +1,127 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import { StyleSheet, Text, View, TextInput, FlatList } from "react-native";
-import Icon from "react-native-vector-icons/AntDesign";
-import { axiosInstance, myKey } from "../../utils/AxiosInstance";
-import { C000, C5EC2A4, Ca1a1a1, CFFF } from "../../utils/GolobalColors";
-import { ArticleType, axiosGetType } from "../types";
-import _ from "lodash";
-import ArticleComponent from "../Components/ArticleComponent";
-import ArticleWebViewModal from "../Components/ArticleWebViewModal";
-import ArticleList from "../Components/ArticleList";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { StyleSheet, Text, View, TextInput } from 'react-native';
+import Icon from 'react-native-vector-icons/AntDesign';
+import { C000, C5EC2A4, CFFF } from '../../utils/GolobalColors';
+import { ArticleType } from '../types';
+import _ from 'lodash';
+import ArticleWebViewModal from '../Components/ArticleWebViewModal';
+import ArticleList from '../Components/ArticleList';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useDispatch, useSelector } from 'react-redux';
+import { getArticless } from '../../utils/reduxToolkit/getArticleSlice';
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: CFFF,
-    height: "100%",
-    paddingHorizontal: 12,
-    paddingTop: 20,
-  },
-  title: {
-    fontSize: 15,
-    color: C5EC2A4,
-    fontWeight: "bold",
-    alignSelf: "flex-end",
-  },
-  welcomeTextContainer: {
-    marginTop: 20,
-    height: 75,
-    justifyContent: "space-around",
-  },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  textInputContainer: {
-    borderWidth: 2,
-    height: 44,
-    borderColor: C5EC2A4,
-    marginTop: 15,
-    paddingHorizontal: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-  },
-  textInputStyle: {
-    width: "94%",
-    height: "100%",
-  },
+   container: {
+      backgroundColor: CFFF,
+      height: '100%',
+      paddingHorizontal: 12,
+      paddingTop: 20,
+   },
+   title: {
+      fontSize: 15,
+      color: C5EC2A4,
+      fontWeight: 'bold',
+      alignSelf: 'flex-end',
+   },
+   welcomeTextContainer: {
+      marginTop: 20,
+      height: 75,
+      justifyContent: 'space-around',
+   },
+   welcomeText: {
+      fontSize: 24,
+      fontWeight: 'bold',
+   },
+   textInputContainer: {
+      borderWidth: 2,
+      height: 44,
+      borderColor: C5EC2A4,
+      marginTop: 15,
+      paddingHorizontal: 12,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-evenly',
+   },
+   textInputStyle: {
+      width: '94%',
+      height: '100%',
+   },
 });
 
 const SearchNewsScreen = () => {
-  const [keyWord, setKeyWord] = useState("");
-  const [page, setPage] = useState(0);
-  const [news, setNews] = useState<ArticleType[]>([]);
-  const [webViewUrl, setWebViewUrl] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+   const [keyWord, setKeyWord] = useState('');
+   const [page, setPage] = useState(0);
+   const [news, setNews] = useState<ArticleType[]>([]);
+   const [webViewUrl, setWebViewUrl] = useState('');
+   const [isLoading, setIsLoading] = useState(false);
+   const dispatch = useDispatch();
+   const getSelector = useSelector((state: any) => state);
+   const getArticles = useCallback(
+      (t: string, pageNumber: number, isInfinite: boolean) => {
+         setIsLoading(true);
+         dispatch(getArticless({ t, page: pageNumber }));
 
-  const getArticles = async (
-    t: string,
-    pageNumber: number,
-    isInfinite: boolean
-  ) => {
-    try {
-      setIsLoading(true);
-      if (t === "") {
-        setNews([]);
+         if (!isInfinite) {
+            // setNews(getData);
+         } else {
+            // setNews((prev) => prev.concat(getData));
+         }
+         setIsLoading(false);
+      },
+      [dispatch]
+   );
+   useEffect(() => {
+      console.log(getSelector);
+   }, [getSelector]);
+   const debounceHandler = useCallback(
+      _.debounce(
+         (t: string, pageNumber: number, isInfinite: boolean) =>
+            getArticles(t, pageNumber, isInfinite),
+         400
+      ),
+      []
+   );
+   const textInputRef = useRef<TextInput>(null);
+   const setKeywordHandler = (t: string) => {
+      setKeyWord(t);
+   };
+
+   useLayoutEffect(() => {
+      if (keyWord !== '') {
+         debounceHandler(keyWord, page, false);
       }
-      const getdata = await axiosInstance.get<axiosGetType>("", {
-        params: {
-          q: t,
-          ["api-key"]: myKey,
-          page: pageNumber,
-        },
-      });
-      if (!isInfinite) {
-        setNews(getdata.data.response.docs);
-      } else {
-        setNews((prev) => prev.concat(getdata.data.response.docs));
+   }, [page, keyWord]);
+   useEffect(() => {
+      if (keyWord !== '') {
+         debounceHandler(keyWord, page, true);
       }
-    } catch (error) {
-      console.log(error, "에러발생");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+   }, [page]);
 
-  const debounceHandler = useCallback(
-    _.debounce(
-      (t: string, page: number, isInfinite: boolean) =>
-        getArticles(t, page, isInfinite),
-      400
-    ),
-    []
-  );
-  const textInputRef = useRef<TextInput>(null);
-  const setKeywordHandler = (t: string) => {
-    setKeyWord(t);
-  };
+   return (
+      <View style={[styles.container, { paddingTop: useSafeAreaInsets().top + 10 }]}>
+         <Text style={styles.title}>숨은 뉴스</Text>
+         <View style={styles.welcomeTextContainer}>
+            <Text style={styles.welcomeText}>어떤 뉴스를</Text>
+            <Text style={styles.welcomeText}>보고 싶으신가요?</Text>
+         </View>
+         {isLoading ? <Text>로딩중입니다....</Text> : <Text> </Text>}
+         <View style={styles.textInputContainer}>
+            <TextInput
+               ref={textInputRef}
+               placeholder="어떤 뉴스를 찾으시나요?"
+               style={styles.textInputStyle}
+               value={keyWord}
+               onChangeText={setKeywordHandler}
+               autoCorrect={false}
+            />
+            <Icon name="search1" size={20} color={C000} />
+         </View>
+         <ArticleList news={news} setWebViewUrl={setWebViewUrl} setPage={setPage} />
 
-  useLayoutEffect(() => {
-    if (keyWord !== "") {
-      debounceHandler(keyWord, 0, false);
-    }
-  }, [page, keyWord]);
-  useEffect(() => {
-    if (keyWord !== "") {
-      debounceHandler(keyWord, page, true);
-    }
-  }, [page]);
-
-  return (
-    <View
-      style={[styles.container, { paddingTop: useSafeAreaInsets().top + 10 }]}
-    >
-      <Text style={styles.title}>숨은 뉴스</Text>
-      <View style={styles.welcomeTextContainer}>
-        <Text style={styles.welcomeText}>어떤 뉴스를</Text>
-        <Text style={styles.welcomeText}>보고 싶으신가요?</Text>
+         <ArticleWebViewModal webViewUrl={webViewUrl} setWebViewUrl={setWebViewUrl} />
       </View>
-      <View style={styles.textInputContainer}>
-        <TextInput
-          ref={textInputRef}
-          placeholder="어떤 뉴스를 찾으시나요?"
-          style={styles.textInputStyle}
-          value={keyWord}
-          onChangeText={setKeywordHandler}
-          autoCorrect={false}
-        />
-        <Icon name="search1" size={20} color={C000} />
-      </View>
-      <ArticleList
-        news={news}
-        setWebViewUrl={setWebViewUrl}
-        setPage={setPage}
-      />
-      {isLoading && <Text>로딩중입니다....</Text>}
-      <ArticleWebViewModal
-        webViewUrl={webViewUrl}
-        setWebViewUrl={setWebViewUrl}
-      />
-    </View>
-  );
+   );
 };
 
 export default SearchNewsScreen;
