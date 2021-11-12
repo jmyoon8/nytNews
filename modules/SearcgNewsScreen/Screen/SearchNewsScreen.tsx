@@ -1,23 +1,30 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { StyleSheet, Text, View, TextInput } from 'react-native';
+import React, {
+   useCallback,
+   useEffect,
+   useLayoutEffect,
+   useRef,
+   useState,
+} from 'react';
+import {
+   StyleSheet,
+   Text,
+   View,
+   TextInput,
+   Alert,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { C000, C5EC2A4, CFFF } from '../../utils/GolobalColors';
-import { ArticleType } from '../types';
+import { C000, C5EC2A4 } from '../../utils/GolobalColors';
+import { GetArticleData } from '../types';
 import _ from 'lodash';
 import ArticleWebViewModal from '../Components/ArticleWebViewModal';
 import ArticleList from '../Components/ArticleList';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
-import { getArticless } from '../../utils/reduxToolkit/getArticleSlice';
+import { getArticlesAsync } from '../../utils/reduxToolkit/getArticleSlice';
+import { globalStyles } from '../../utils/GlobalStyle';
 
 const styles = StyleSheet.create({
-   container: {
-      backgroundColor: CFFF,
-      height: '100%',
-      paddingHorizontal: 12,
-      paddingTop: 20,
-   },
    title: {
       fontSize: 15,
       color: C5EC2A4,
@@ -52,32 +59,18 @@ const styles = StyleSheet.create({
 const SearchNewsScreen = () => {
    const [keyWord, setKeyWord] = useState('');
    const [page, setPage] = useState(0);
-   const [news, setNews] = useState<ArticleType[]>([]);
-   const [webViewUrl, setWebViewUrl] = useState('');
    const [isLoading, setIsLoading] = useState(false);
    const dispatch = useDispatch();
-   const getSelector = useSelector((state: any) => state);
-   const getArticles = useCallback(
-      (t: string, pageNumber: number, isInfinite: boolean) => {
-         setIsLoading(true);
-         dispatch(getArticless({ t, page: pageNumber }));
-
-         if (!isInfinite) {
-            // setNews(getData);
-         } else {
-            // setNews((prev) => prev.concat(getData));
-         }
-         setIsLoading(false);
-      },
-      [dispatch]
+   const getSelector: GetArticleData = useSelector(
+      (state: any) => state.getArticleSlice
    );
-   useEffect(() => {
-      console.log(getSelector);
-   }, [getSelector]);
+
    const debounceHandler = useCallback(
       _.debounce(
          (t: string, pageNumber: number, isInfinite: boolean) =>
-            getArticles(t, pageNumber, isInfinite),
+            dispatch(
+               getArticlesAsync({ t, page: pageNumber, isInfinite })
+            ),
          400
       ),
       []
@@ -97,13 +90,30 @@ const SearchNewsScreen = () => {
          debounceHandler(keyWord, page, true);
       }
    }, [page]);
-
+   useEffect(() => {
+      if (getSelector.apiState === 'pending') {
+         setIsLoading(true);
+      }
+      if (getSelector.apiState === 'fulfilled') {
+         setIsLoading(false);
+      }
+      if (getSelector.apiState === 'rejected') {
+         Alert.alert('서버에러');
+      }
+   }, [getSelector]);
    return (
-      <View style={[styles.container, { paddingTop: useSafeAreaInsets().top + 10 }]}>
+      <View
+         style={[
+            globalStyles.container,
+            { paddingTop: useSafeAreaInsets().top + 10 },
+         ]}
+      >
          <Text style={styles.title}>숨은 뉴스</Text>
          <View style={styles.welcomeTextContainer}>
-            <Text style={styles.welcomeText}>어떤 뉴스를</Text>
-            <Text style={styles.welcomeText}>보고 싶으신가요?</Text>
+            <Text style={globalStyles.welcomeText}>어떤 뉴스를</Text>
+            <Text style={globalStyles.welcomeText}>
+               보고 싶으신가요?
+            </Text>
          </View>
          {isLoading ? <Text>로딩중입니다....</Text> : <Text> </Text>}
          <View style={styles.textInputContainer}>
@@ -117,9 +127,13 @@ const SearchNewsScreen = () => {
             />
             <Icon name="search1" size={20} color={C000} />
          </View>
-         <ArticleList news={news} setWebViewUrl={setWebViewUrl} setPage={setPage} />
 
-         <ArticleWebViewModal webViewUrl={webViewUrl} setWebViewUrl={setWebViewUrl} />
+         <ArticleList
+            news={getSelector?.result?.response?.docs}
+            setPage={setPage}
+         />
+
+         <ArticleWebViewModal />
       </View>
    );
 };

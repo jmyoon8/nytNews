@@ -1,19 +1,25 @@
 import moment from 'moment';
 import React, { useLayoutEffect, useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import {
+   StyleSheet,
+   Text,
+   View,
+   TouchableOpacity,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import { useDispatch } from 'react-redux';
 import {
    deleteClipData,
    getClipedArticle,
    setClipData,
 } from '../../utils/AsyncStorageHandler';
 import { C000, Ca1a1a1, Ceae649 } from '../../utils/GolobalColors';
+import { setWebViewUrl } from '../../utils/reduxToolkit/getArticleSlice';
 import { ArticleType } from '../types';
 
 const styles = StyleSheet.create({
    articleContainer: {
-      paddingLeft: 12,
-      paddingRight: 40,
+      paddingHorizontal: 12,
       marginBottom: 8,
       height: 100,
       flexDirection: 'row',
@@ -25,6 +31,7 @@ const styles = StyleSheet.create({
    articleBox: {
       justifyContent: 'space-around',
       height: '100%',
+      flex: 1,
    },
    headerLineText: {
       fontSize: 18,
@@ -39,22 +46,13 @@ const styles = StyleSheet.create({
    },
    clipContainer: {
       flexDirection: 'row',
-      width: '75%',
       justifyContent: 'space-between',
    },
 });
 
 const ArticleComponent = (props: any) => {
-   const {
-      _id,
-      web_url,
-      pub_date,
-      headline,
-      snippet,
-      setWebViewUrl,
-   }: ArticleType & {
-      setWebViewUrl: React.Dispatch<React.SetStateAction<string>>;
-   } = props;
+   const { _id, web_url, pub_date, headline, snippet }: ArticleType =
+      props;
    // keywords,
    // abstract,
    // byline,
@@ -67,7 +65,13 @@ const ArticleComponent = (props: any) => {
    const setClip = async () => {
       if (!isClip) {
          setIsClip(true);
-         await setClipData({ snippet, web_url, _id, headline, pub_date });
+         await setClipData({
+            snippet,
+            web_url,
+            _id,
+            headline,
+            pub_date,
+         });
       } else {
          setIsClip(false);
          await deleteClipData(_id);
@@ -81,14 +85,15 @@ const ArticleComponent = (props: any) => {
          }
       });
    }, [_id]);
-
+   const dispatch = useDispatch();
    return (
-      <TouchableOpacity
-         onPress={() => setWebViewUrl(web_url)}
-         style={styles.articleContainer}
-      >
+      <TouchableOpacity style={styles.articleContainer}>
          <View style={styles.articleBox}>
-            <Text numberOfLines={1} style={styles.headerLineText}>
+            <Text
+               onPress={() => dispatch(setWebViewUrl(web_url))}
+               numberOfLines={1}
+               style={styles.headerLineText}
+            >
                {headline.print_headline || 'Title - Is - Missing'}
             </Text>
             <Text style={styles.snippetText} numberOfLines={2}>
@@ -96,10 +101,15 @@ const ArticleComponent = (props: any) => {
             </Text>
             <View style={styles.clipContainer}>
                <Text style={styles.pubDateText}>
-                  작설일자 : {moment(pub_date).format('YYYY년 MM월 DD일 HH:mm')}
+                  작설일자 :{' '}
+                  {moment(pub_date).format('YYYY년 MM월 DD일 HH:mm')}
                </Text>
                <TouchableOpacity onPress={setClip}>
-                  <Icon name="paperclip" size={18} color={isClip ? Ceae649 : C000} />
+                  <Icon
+                     name="paperclip"
+                     size={18}
+                     color={isClip ? Ceae649 : C000}
+                  />
                </TouchableOpacity>
             </View>
          </View>

@@ -1,43 +1,76 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Alert } from 'react-native';
 import { axiosInstance, myKey } from '../AxiosInstance';
-import { DefaultStateType } from '../NavigatorsAndTypes';
+import {
+   DefaultStateType,
+   GetArtibleType,
+   GetArticlesAsyncType,
+} from './reduxType';
 
-export const getArticless = createAsyncThunk(
-   'article/getArticless',
-   async ({ t, page }: { t: string; page: number }) => {
-      try {
-         const { data } = await axiosInstance.get('', {
-            params: {
-               q: t,
-               ['api-key']: myKey,
-               page,
-            },
-         });
-         return data;
-      } catch (error) {
-         return Alert.alert('서버에러!');
-      }
+export const getArticlesAsync = createAsyncThunk(
+   'article/getArticlesAsync',
+   async ({
+      t,
+      page,
+      isInfinite,
+   }: GetArtibleType): GetArticlesAsyncType => {
+      const { data } = await axiosInstance.get('', {
+         params: {
+            q: t,
+            ['api-key']: myKey,
+            page,
+         },
+      });
+      console.log(data);
+      return { data, isInfinite: isInfinite };
    }
 );
-const getArticleslice = createSlice<DefaultStateType, any, any>({
+
+const getArticleSlice = createSlice<DefaultStateType, any, any>({
    name: 'article',
    initialState: {
-      apiState: 'pending',
-      result: '',
+      apiState: '',
+      result: {
+         copyright: '',
+         response: {
+            docs: [],
+         },
+         status: '',
+      },
+      webViewUrl: '',
+      searchOption: 'title',
    },
-   reducers: {},
+
+   reducers: {
+      setWebViewUrl: (state: DefaultStateType, action: any) => {
+         return { ...state, webViewUrl: action.payload };
+      },
+      setSearchOption: (state: DefaultStateType, action: any) => {
+         return { ...state, searchOption: action.payload };
+      },
+   },
+
    extraReducers: (builder) => {
-      builder.addCase(getArticless.pending, (state) => {
+      builder.addCase(getArticlesAsync.pending, (state) => {
          state.apiState = 'pending';
       });
-      builder.addCase(getArticless.fulfilled, (state, action) => {
+      builder.addCase(getArticlesAsync.fulfilled, (state, action) => {
          state.apiState = 'fulfilled';
-         state.result = action.payload;
+         const {
+            payload: { data, isInfinite },
+         } = action;
+
+         if (isInfinite) {
+            state.result.response.docs =
+               state.result.response.docs.concat(data.response.docs);
+         } else {
+            state.result = data;
+         }
       });
-      builder.addCase(getArticless.rejected, (state) => {
+      builder.addCase(getArticlesAsync.rejected, (state) => {
          state.apiState = 'rejected';
       });
    },
 });
-export default getArticleslice.reducer;
+export const { setWebViewUrl, setSearchOption } =
+   getArticleSlice.actions as any;
+export default getArticleSlice.reducer;

@@ -1,6 +1,9 @@
+import _ from 'lodash';
 import React from 'react';
 import { FlatList, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 import { C5EC2A4 } from '../../utils/GolobalColors';
+import { DefaultStateType } from '../../utils/reduxToolkit/reduxType';
 import { ArticleListProps } from '../types';
 import ArticleComponent from './ArticleComponent';
 
@@ -9,20 +12,63 @@ const styles = StyleSheet.create({
       borderWidth: 2,
       marginTop: 8,
       borderColor: C5EC2A4,
+      zIndex: -10,
    },
 });
-const ArticleList = ({ news, setWebViewUrl, setPage }: ArticleListProps) => {
+const ArticleList = ({
+   news,
+   setPage,
+   keyWord,
+   clipsLength,
+}: ArticleListProps) => {
+   const getSeletor: DefaultStateType = useSelector(
+      (state: any) => state.getArticleSlice
+   );
+
+   const infiniteScrollHandler = () => {
+      setPage((prev) => {
+         let maxPage = 0;
+         if (clipsLength) {
+            maxPage = Math.floor(clipsLength / 10);
+            if (clipsLength % 10 > 0) {
+               maxPage = maxPage + 1;
+            }
+            if (prev === maxPage) {
+               return prev;
+            }
+         }
+         return prev + 1;
+      });
+   };
+   const debounceHandler = _.debounce(
+      () => infiniteScrollHandler(),
+      400
+   );
+
    return (
       <FlatList
          bounces={false}
          data={news}
          style={styles.flatStyle}
-         onEndReachedThreshold={0.3}
+         onEndReachedThreshold={0.4}
          keyExtractor={({ _id }) => _id}
-         onEndReached={() => setPage((prev) => prev + 1)}
-         renderItem={({ item }) => (
-            <ArticleComponent {...item} setWebViewUrl={setWebViewUrl} />
-         )}
+         onEndReached={debounceHandler}
+         renderItem={({ item }) => {
+            if (
+               getSeletor.searchOption === 'title'
+                  ? keyWord &&
+                    item.headline.print_headline?.includes(keyWord)
+                  : keyWord && item.snippet.includes(keyWord)
+            ) {
+               console.log(item.headline.print_headline);
+               return <ArticleComponent {...item} />;
+            }
+            if (!keyWord || keyWord === '') {
+               return <ArticleComponent {...item} />;
+            }
+
+            return null;
+         }}
       />
    );
 };

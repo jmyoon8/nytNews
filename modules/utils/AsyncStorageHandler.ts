@@ -8,11 +8,17 @@ export const setClipData = async (item: ArticleType) => {
          (await AsyncStorage.getItem('clips')) as string
       );
       if (!getClip) {
-         return await AsyncStorage.setItem('clips', JSON.stringify([item]));
+         return await AsyncStorage.setItem(
+            'clips',
+            JSON.stringify([item])
+         );
       } else {
          getClip.push(item);
 
-         return await AsyncStorage.setItem('clips', JSON.stringify(getClip));
+         return await AsyncStorage.setItem(
+            'clips',
+            JSON.stringify(getClip)
+         );
       }
    } catch (error) {
       console.log(error);
@@ -43,7 +49,9 @@ export const getClipedArticle = async (
    if (!getItem) {
       cb(null);
    } else {
-      const getArticle = getItem.find((item) => item._id === articleId);
+      const getArticle = getItem.find(
+         (item) => item._id === articleId
+      );
       if (getArticle) {
          cb(getArticle);
       } else {

@@ -27,7 +27,11 @@ const App = () => {
                   component={SearchNewsScreen}
                   options={{
                      tabBarIcon: ({ color, size }) => (
-                        <Icon name="search1" size={size} color={color} />
+                        <Icon
+                           name="search1"
+                           size={size}
+                           color={color}
+                        />
                      ),
                      title: '뉴스검색',
                   }}
@@ -35,7 +39,11 @@ const App = () => {
                <MainTab.Screen
                   options={{
                      tabBarIcon: ({ size, color }) => (
-                        <Icon name="paperclip" color={color} size={size} />
+                        <Icon
+                           name="paperclip"
+                           color={color}
+                           size={size}
+                        />
                      ),
                      title: '내가 저장한 뉴스',
                   }}
