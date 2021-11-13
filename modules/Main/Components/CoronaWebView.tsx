@@ -13,12 +13,12 @@ const CoronaWebView = () => {
       <View style={styles.minHeight100}>
          {isWebViewLoading && <Text>로딩중...</Text>}
          <WebView
+            style={{ minHeight: 10 }}
             source={{
                uri: 'https://www.nytimes.com/article/coronavirus-county-data-us.html',
             }}
             startInLoadingState={true}
             originWhitelist={['']}
-            pagingEnabled={false}
             onNavigationStateChange={(event: WebViewNavigation) => {
                setIsWebViewLoading(event.loading);
             }}
