@@ -15,9 +15,9 @@ import Icon from 'react-native-vector-icons/AntDesign';
 import { C000, C5EC2A4, CFFF } from '../../utils/GolobalColors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { globalStyles } from '../../utils/GlobalStyle';
-import { ArticleType } from '../../SearcgNewsScreen/types';
-import ArticleList from '../../SearcgNewsScreen/Components/ArticleList';
-import ArticleWebViewModal from '../../SearcgNewsScreen/Components/ArticleWebViewModal';
+import { ArticleType } from '../../SearchNews/types';
+import ArticleList from '../../SearchNews/Components/ArticleList';
+import ArticleWebViewModal from '../../SearchNews/Components/ArticleWebViewModal';
 import { getClipedArticles } from '../../utils/AsyncStorageHandler';
 import { useIsFocused } from '@react-navigation/core';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,10 +37,7 @@ const styles = StyleSheet.create({
       height: 75,
       justifyContent: 'space-around',
    },
-   welcomeText: {
-      fontSize: 24,
-      fontWeight: 'bold',
-   },
+
    textInputContainer: {
       borderWidth: 2,
       height: 44,
@@ -72,20 +69,6 @@ const styles = StyleSheet.create({
       position: 'relative',
       backgroundColor: CFFF,
       zIndex: 10,
-   },
-   searchOptionListContainer: {
-      borderTopWidth: 0,
-      borderWidth: 1.5,
-      alignItems: 'center',
-      paddingVertical: 5,
-      justifyContent: 'space-between',
-      height: 50,
-      position: 'absolute',
-      right: 0,
-      width: 120,
-      bottom: -50,
-      backgroundColor: CFFF,
-      borderColor: C5EC2A4,
    },
 });
 
@@ -137,7 +120,6 @@ const ClipNewsScreen = () => {
             );
          });
       } else {
-         console.log(clips.length);
          setScliceClip([]);
       }
    }, [clips, page]);
@@ -189,7 +171,7 @@ const ClipNewsScreen = () => {
             news={keyWord === '' ? sliceClip : clips}
             setPage={setPage}
             keyWord={keyWord}
-            clipsLength={clips.length}
+            // clipsLength={clips.length}
          />
 
          <ArticleWebViewModal />

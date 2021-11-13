@@ -12,16 +12,32 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { MainTab } from './modules/utils/NavigatorsAndTypes';
 import Icon from 'react-native-vector-icons/AntDesign';
-import SearchNewsScreen from './modules/SearcgNewsScreen/Screen/SearchNewsScreen';
+import MaterialsIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import SearchNewsScreen from './modules/SearchNews/Screen/SearchScreen';
 import ClipNewsScreen from './modules/ClipNewsScreen/Screen/ClipNewsScreen';
 import { Provider } from 'react-redux';
 import configureStroe from './modules/utils/reduxToolkit/configureStroe';
+import Main from './modules/Main/Screen/Main';
 
 const App = () => {
    return (
       <Provider store={configureStroe}>
          <NavigationContainer>
             <MainTab.Navigator screenOptions={{ headerShown: false }}>
+               <MainTab.Screen
+                  name="Main"
+                  component={Main}
+                  options={{
+                     tabBarIcon: ({ color, size }) => (
+                        <MaterialsIcon
+                           name="newspaper-variant-multiple-outline"
+                           size={size}
+                           color={color}
+                        />
+                     ),
+                     title: '메인',
+                  }}
+               />
                <MainTab.Screen
                   name="SearchNews"
                   component={SearchNewsScreen}

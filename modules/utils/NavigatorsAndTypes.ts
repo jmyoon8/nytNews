@@ -8,8 +8,9 @@ export const MainTab = createBottomTabNavigator<MainTabParamList>();
 
 // navigationTypes
 export type MainTabParamList = {
-   SearchNews: { initParam: string };
-   ClipNews: { initParam: string };
+   Main: undefined;
+   SearchNews: undefined;
+   ClipNews: undefined;
 };
 // screenTypes
 export type SearchNewsProps = BottomTabScreenProps<

@@ -12,9 +12,10 @@ import {
    View,
    TextInput,
    Alert,
+   Pressable,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { C000, C5EC2A4 } from '../../utils/GolobalColors';
+import { C000, C5EC2A4, CFFF } from '../../utils/GolobalColors';
 import { GetArticleData } from '../types';
 import _ from 'lodash';
 import ArticleWebViewModal from '../Components/ArticleWebViewModal';
@@ -23,8 +24,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { getArticlesAsync } from '../../utils/reduxToolkit/getArticleSlice';
 import { globalStyles } from '../../utils/GlobalStyle';
+import { setRecentlyKeyword } from '../../utils/AsyncStorageHandler';
+import RecentlyKeyWordComponent from '../Components/RecentlyKeyWordComponent';
 
 const styles = StyleSheet.create({
+   container: {
+      backgroundColor: CFFF,
+      height: '100%',
+      paddingHorizontal: 12,
+      paddingTop: 20,
+      justifyContent: 'flex-start',
+   },
    title: {
       fontSize: 15,
       color: C5EC2A4,
@@ -33,12 +43,8 @@ const styles = StyleSheet.create({
    },
    welcomeTextContainer: {
       marginTop: 20,
-      height: 75,
       justifyContent: 'space-around',
-   },
-   welcomeText: {
-      fontSize: 24,
-      fontWeight: 'bold',
+      height: 75,
    },
    textInputContainer: {
       borderWidth: 2,
@@ -56,8 +62,10 @@ const styles = StyleSheet.create({
    },
 });
 
-const SearchNewsScreen = () => {
+const SearchScreen = () => {
    const [keyWord, setKeyWord] = useState('');
+   const [isRecentlyItemVisible, setIsRecentlyItemVisible] =
+      useState(false);
    const [page, setPage] = useState(0);
    const [isLoading, setIsLoading] = useState(false);
    const dispatch = useDispatch();
@@ -67,11 +75,26 @@ const SearchNewsScreen = () => {
 
    const debounceHandler = useCallback(
       _.debounce(
-         (t: string, pageNumber: number, isInfinite: boolean) =>
-            dispatch(
-               getArticlesAsync({ t, page: pageNumber, isInfinite })
-            ),
-         400
+         async (
+            t: string,
+            pageNumber: number,
+            isInfinite: boolean
+         ) => {
+            if (t.length > 1) {
+               dispatch(
+                  getArticlesAsync({
+                     t,
+                     page: pageNumber,
+                     isInfinite,
+                  })
+               );
+               if (!isInfinite) {
+                  await setRecentlyKeyword(t);
+               }
+               setIsRecentlyItemVisible(false);
+            }
+         },
+         1000
       ),
       []
    );
@@ -101,41 +124,54 @@ const SearchNewsScreen = () => {
          Alert.alert('서버에러');
       }
    }, [getSelector]);
+
    return (
-      <View
+      <Pressable
          style={[
-            globalStyles.container,
+            styles.container,
             { paddingTop: useSafeAreaInsets().top + 10 },
          ]}
+         onPress={() => textInputRef.current?.blur()}
       >
          <Text style={styles.title}>숨은 뉴스</Text>
          <View style={styles.welcomeTextContainer}>
-            <Text style={globalStyles.welcomeText}>어떤 뉴스를</Text>
             <Text style={globalStyles.welcomeText}>
-               보고 싶으신가요?
+               숨은 기사와 함께
+            </Text>
+            <Text style={globalStyles.welcomeText}>
+               보고싶은 뉴스를 검색해보세요!
             </Text>
          </View>
          {isLoading ? <Text>로딩중입니다....</Text> : <Text> </Text>}
-         <View style={styles.textInputContainer}>
-            <TextInput
-               ref={textInputRef}
-               placeholder="어떤 뉴스를 찾으시나요?"
-               style={styles.textInputStyle}
-               value={keyWord}
-               onChangeText={setKeywordHandler}
-               autoCorrect={false}
-            />
-            <Icon name="search1" size={20} color={C000} />
+         <View>
+            <View style={styles.textInputContainer}>
+               <TextInput
+                  onPressIn={() => setIsRecentlyItemVisible(true)}
+                  onBlur={() => setIsRecentlyItemVisible(false)}
+                  ref={textInputRef}
+                  placeholder="어떤 뉴스를 찾으시나요?"
+                  style={styles.textInputStyle}
+                  value={keyWord}
+                  onChangeText={setKeywordHandler}
+                  autoCorrect={false}
+               />
+               <Icon name="search1" size={20} color={C000} />
+            </View>
+            {isRecentlyItemVisible && (
+               <RecentlyKeyWordComponent
+                  keyword={keyWord}
+                  setKeyWord={setKeyWord}
+                  setIsRecentlyItemVisible={setIsRecentlyItemVisible}
+               />
+            )}
          </View>
-
          <ArticleList
             news={getSelector?.result?.response?.docs}
             setPage={setPage}
          />
-
          <ArticleWebViewModal />
-      </View>
+      </Pressable>
    );
 };
 
-export default SearchNewsScreen;
+export default SearchScreen;

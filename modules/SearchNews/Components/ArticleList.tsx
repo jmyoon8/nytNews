@@ -51,6 +51,7 @@ const ArticleList = ({
          data={news}
          style={styles.flatStyle}
          onEndReachedThreshold={0.4}
+         scrollEnabled
          keyExtractor={({ _id }) => _id}
          onEndReached={debounceHandler}
          renderItem={({ item }) => {

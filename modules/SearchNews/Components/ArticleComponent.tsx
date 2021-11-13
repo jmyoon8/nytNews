@@ -7,6 +7,7 @@ import {
    TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useDispatch } from 'react-redux';
 import {
    deleteClipData,
@@ -48,6 +49,11 @@ const styles = StyleSheet.create({
       flexDirection: 'row',
       justifyContent: 'space-between',
    },
+   IconContainer: {
+      flexDirection: 'row',
+      width: '15%',
+      justifyContent: 'space-between',
+   },
 });
 
 const ArticleComponent = (props: any) => {
@@ -77,6 +83,7 @@ const ArticleComponent = (props: any) => {
          await deleteClipData(_id);
       }
    };
+
    useLayoutEffect(() => {
       // 클립채크
       getClipedArticle(_id, (item) => {
@@ -94,7 +101,7 @@ const ArticleComponent = (props: any) => {
                numberOfLines={1}
                style={styles.headerLineText}
             >
-               {headline.print_headline || 'Title - Is - Missing'}
+               {headline.print_headline || headline.main}
             </Text>
             <Text style={styles.snippetText} numberOfLines={2}>
                {snippet}
@@ -104,13 +111,20 @@ const ArticleComponent = (props: any) => {
                   작설일자 :{' '}
                   {moment(pub_date).format('YYYY년 MM월 DD일 HH:mm')}
                </Text>
-               <TouchableOpacity onPress={setClip}>
-                  <Icon
-                     name="paperclip"
-                     size={18}
-                     color={isClip ? Ceae649 : C000}
-                  />
-               </TouchableOpacity>
+               <View style={styles.IconContainer}>
+                  <TouchableOpacity onPress={setClip}>
+                     <Icon
+                        name="paperclip"
+                        size={20}
+                        color={isClip ? Ceae649 : C000}
+                     />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                     onPress={() => dispatch(setWebViewUrl(web_url))}
+                  >
+                     <MaterialCommunityIcons name="web" size={20} />
+                  </TouchableOpacity>
+               </View>
             </View>
          </View>
       </TouchableOpacity>

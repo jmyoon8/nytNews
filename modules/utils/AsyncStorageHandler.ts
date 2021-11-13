@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ArticleType } from '../SearcgNewsScreen/types';
+import { ArticleType } from '../SearchNews/types';
 
 // 아티클 저장
 export const setClipData = async (item: ArticleType) => {
@@ -59,11 +59,64 @@ export const getClipedArticle = async (
       }
    }
 };
-
+// 클립한 데이터 가져오기
 export const getClipedArticles = async () => {
    const getItems: ArticleType[] = JSON.parse(
       (await AsyncStorage.getItem('clips')) as string
    );
+   if (getItems) {
+      return getItems;
+   } else {
+      return [];
+   }
+};
+// 키워드 저장
+export const setRecentlyKeyword = async (keyWord: string) => {
+   console.log(keyWord);
+   if (!keyWord) {
+      return;
+   }
+   const getKeyword: null | string[] = JSON.parse(
+      (await AsyncStorage.getItem('keyword')) as string
+   );
+   if (getKeyword) {
+      if (getKeyword.indexOf(keyWord) === -1) {
+         // 키워드가 없으면 저장
+         getKeyword.push(keyWord);
+         await AsyncStorage.setItem(
+            'keyword',
+            JSON.stringify(getKeyword)
+         );
+      }
+   } else {
+      await AsyncStorage.setItem(
+         'keyword',
+         JSON.stringify([keyWord])
+      );
+   }
+};
+// 키워드 가져오기
+export const getRecentlyKeyWord = async () => {
+   const getKeyWords: null | string[] = JSON.parse(
+      (await AsyncStorage.getItem('keyword')) as string
+   );
+   if (getKeyWords) {
+      return getKeyWords;
+   } else {
+      return [];
+   }
+};
+// 키워드 제거
+export const removeRecentlyKeyword = async (
+   deleteKey: string,
+   cb: (isDeleted: boolean) => any
+) => {
+   let getKeyWords: string[] = JSON.parse(
+      (await AsyncStorage.getItem('keyword')) as string
+   );
+   getKeyWords = getKeyWords.filter((item) => item !== deleteKey);
 
-   return getItems;
+   AsyncStorage.setItem('keyword', JSON.stringify(getKeyWords))
+      .then(() => cb(true))
+      .catch(() => cb(false));
 };

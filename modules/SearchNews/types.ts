@@ -16,6 +16,7 @@ export type ArticleType = {
    pub_date: string;
    web_url: string;
    snippet: string;
+   // multimedia?: [];
    //   keywords: [];
    //   abstract: string;
    //   byline: [];
@@ -24,7 +25,6 @@ export type ArticleType = {
    //   section_name: string;
    //   source: string;
    //   type_of_material: string;
-   //   multimedia: [];
 };
 export type GetArticleData = {
    apiState: ApiState;
@@ -48,5 +48,17 @@ export interface ArticleListProps {
    setPage: React.Dispatch<React.SetStateAction<number>>;
    keyWord?: string;
    clipsLength?: number;
+}
+export interface RecentlyKeyWordComponentProps {
+   keyword: string;
+   setKeyWord: React.Dispatch<React.SetStateAction<string>>;
+   setIsRecentlyItemVisible: React.Dispatch<
+      React.SetStateAction<boolean>
+   >;
+}
+export interface KeyWordComponentProps {
+   item: string;
+   setKeyWord: (item: string) => void;
+   deleteKeyword: (item: string) => void;
 }
 // 검색 결과에는 메인 헤드라인 제목(headline.main),기사 작성일(pub_date)가 포함되어야 한다.
