@@ -9,5 +9,4 @@ export const deskArray = [
    'Movies',
    'Science',
    'Sports',
-   'Weather',
 ];

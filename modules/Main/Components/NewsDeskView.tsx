@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import ArticleComponent from '../../SearchNews/Components/ArticleComponent';
 import ArticleWebViewModal from '../../SearchNews/Components/ArticleWebViewModal';
 import { ArticleType } from '../../SearchNews/types';
-import { getNewsDeskAsync } from '../../utils/reduxToolkit/getArticleSlice';
-import { DefaultStateType } from '../../utils/reduxToolkit/reduxType';
+import { axiosInstance, myKey } from '../../utils/AxiosInstance';
 import { NewDeskViewProps } from '../type';
 
 const styles = StyleSheet.create({
@@ -15,31 +13,38 @@ const styles = StyleSheet.create({
 });
 
 const NewDeskView = ({ deskType }: NewDeskViewProps) => {
-   const dispatch = useDispatch();
-   const getSelect: DefaultStateType = useSelector(
-      (state: any) => state.getArticleSlice
-   );
    const [isLoading, setIsLoading] = useState(false);
+   const [articles, setArticles] = useState<ArticleType[]>([]);
+
    useEffect(() => {
-      dispatch(getNewsDeskAsync({ deskType }));
-   }, [deskType, dispatch]);
-   useEffect(() => {
-      if (getSelect.apiState === 'pending') {
+      const getNewsDeskAsync = async () => {
          setIsLoading(true);
-      }
-      if (
-         getSelect.apiState === 'fulfilled' ||
-         getSelect.apiState === 'rejected'
-      ) {
-         setIsLoading(false);
-      }
-   }, [getSelect]);
+         try {
+            const { data } = await axiosInstance.get('', {
+               params: {
+                  fq: `news_desk:("${deskType}")`,
+                  ['api-key']: myKey,
+               },
+            });
+            setArticles(data.response.docs);
+         } catch (error) {
+            Alert.alert(
+               '너무 많은 요청이 있습니다 잠시후 다시 시도해주세요'
+            );
+         } finally {
+            setIsLoading(false);
+         }
+      };
+
+      getNewsDeskAsync();
+   }, [deskType]);
+
    return (
       <View style={styles.minHeight}>
          {isLoading ? (
             <Text>로딩중..</Text>
          ) : (
-            getSelect.newsDesk?.map((item: ArticleType) => (
+            articles.map((item: ArticleType) => (
                <ArticleComponent key={item._id} {...item} />
             ))
          )}

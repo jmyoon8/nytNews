@@ -4,7 +4,6 @@ import {
    DefaultStateType,
    GetArtibleType,
    GetArticlesAsyncType,
-   GetNewsDeskType,
 } from './reduxType';
 
 export const getArticlesAsync = createAsyncThunk(
@@ -23,19 +22,6 @@ export const getArticlesAsync = createAsyncThunk(
       });
       console.log(data);
       return { data, isInfinite: isInfinite };
-   }
-);
-export const getNewsDeskAsync = createAsyncThunk(
-   'article/NewsDeskAsync',
-   async ({ deskType }: { deskType: string }): GetNewsDeskType => {
-      const { data } = await axiosInstance.get('', {
-         params: {
-            fq: `news_desk:("${deskType}")`,
-            ['api-key']: myKey,
-         },
-      });
-
-      return { data };
    }
 );
 
@@ -82,16 +68,6 @@ const getArticleSlice = createSlice<DefaultStateType, any, any>({
          }
       });
       builder.addCase(getArticlesAsync.rejected, (state) => {
-         state.apiState = 'rejected';
-      });
-      builder.addCase(getNewsDeskAsync.pending, (state) => {
-         state.apiState = 'pending';
-      });
-      builder.addCase(getNewsDeskAsync.fulfilled, (state, action) => {
-         state.apiState = 'fulfilled';
-         state.newsDesk = action.payload.data.response.docs;
-      });
-      builder.addCase(getNewsDeskAsync.rejected, (state) => {
          state.apiState = 'rejected';
       });
    },
