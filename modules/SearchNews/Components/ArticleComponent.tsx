@@ -5,6 +5,7 @@ import {
    Text,
    View,
    TouchableOpacity,
+   Pressable,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -94,7 +95,7 @@ const ArticleComponent = (props: any) => {
    }, [_id]);
    const dispatch = useDispatch();
    return (
-      <View style={styles.articleContainer}>
+      <Pressable style={styles.articleContainer}>
          <View style={styles.articleBox}>
             <Text numberOfLines={1} style={styles.headerLineText}>
                {headline.print_headline || headline.main}
@@ -123,7 +124,7 @@ const ArticleComponent = (props: any) => {
                </View>
             </View>
          </View>
-      </View>
+      </Pressable>
    );
 };
 
