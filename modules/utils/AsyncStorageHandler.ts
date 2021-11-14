@@ -35,7 +35,9 @@ export const deleteClipData = async (articleId: string) => {
          getClip = getClip.filter((item) => item._id !== articleId);
          await AsyncStorage.setItem('clips', JSON.stringify(getClip));
       }
-   } catch (error) {}
+   } catch (error) {
+      console.log(error);
+   }
 };
 
 // 클립에 파라미터로 넘겨준 ID의 기사가있는지 찾는다
@@ -59,7 +61,7 @@ export const getClipedArticle = async (
       }
    }
 };
-// 클립한 데이터 가져오기
+// 저장한 아티클 데이터 가져오기
 export const getClipedArticles = async () => {
    const getItems: ArticleType[] = JSON.parse(
       (await AsyncStorage.getItem('clips')) as string
@@ -119,4 +121,77 @@ export const removeRecentlyKeyword = async (
    AsyncStorage.setItem('keyword', JSON.stringify(getKeyWords))
       .then(() => cb(true))
       .catch(() => cb(false));
+};
+
+// newsDesk 저장
+export const setClipNewSDeskData = async (item: string) => {
+   try {
+      let getClip: string[] | null = JSON.parse(
+         (await AsyncStorage.getItem('newsDesk')) as string
+      );
+      if (!getClip) {
+         return await AsyncStorage.setItem(
+            'newsDesk',
+            JSON.stringify([item])
+         );
+      } else {
+         getClip.push(item);
+
+         return await AsyncStorage.setItem(
+            'newsDesk',
+            JSON.stringify(getClip)
+         );
+      }
+   } catch (error) {
+      console.log(error);
+   }
+};
+
+// newDesk 지우기
+export const deleteClipNewsDeskData = async (newsDeskId: string) => {
+   try {
+      let getClip: string[] | null = JSON.parse(
+         (await AsyncStorage.getItem('newsDesk')) as string
+      );
+      if (getClip) {
+         getClip = getClip.filter((item) => item !== newsDeskId);
+         await AsyncStorage.setItem(
+            'newsDesk',
+            JSON.stringify(getClip)
+         );
+      }
+   } catch (error) {
+      console.log(error);
+   }
+};
+
+// newsDesk이름이 저장되어있는지 알아본다
+export const getClipedNewsDesk = async (
+   newsDeskId: string,
+   cb: (item: null | string) => any
+) => {
+   const getItem: string[] = JSON.parse(
+      (await AsyncStorage.getItem('newsDesk')) as string
+   );
+   if (!getItem) {
+      cb(null);
+   } else {
+      const getArticle = getItem.find((item) => item === newsDeskId);
+      if (getArticle) {
+         cb(getArticle);
+      } else {
+         cb(null);
+      }
+   }
+};
+// 클립한 데이터 가져오기
+export const getClipedNewsDesks = async () => {
+   const getItems: string[] = JSON.parse(
+      (await AsyncStorage.getItem('newsDesk')) as string
+   );
+   if (getItems) {
+      return getItems;
+   } else {
+      return [];
+   }
 };

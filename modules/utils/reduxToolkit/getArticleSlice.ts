@@ -1,9 +1,16 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { axiosInstance, myKey } from '../AxiosInstance';
+import {
+   axiosInstance,
+   mostPopularUrl,
+   myKey,
+   searchUrl,
+} from '../AxiosInstance';
 import {
    DefaultStateType,
    GetArtibleType,
    GetArticlesAsyncType,
+   GetMostViedArticlesAsyncType,
+   GetMostViewArtibleType,
 } from './reduxType';
 
 export const getArticlesAsync = createAsyncThunk(
@@ -13,15 +20,32 @@ export const getArticlesAsync = createAsyncThunk(
       page,
       isInfinite,
    }: GetArtibleType): GetArticlesAsyncType => {
-      const { data } = await axiosInstance.get('', {
+      const { data } = await axiosInstance.get(searchUrl, {
          params: {
             q: t,
             ['api-key']: myKey,
             page,
          },
       });
-      console.log(data);
+
       return { data, isInfinite: isInfinite };
+   }
+);
+export const getMostViewArticlesAsync = createAsyncThunk(
+   'article/getMostViewArticlesAsync',
+   async ({
+      days,
+   }: GetMostViewArtibleType): GetMostViedArticlesAsyncType => {
+      const { data } = await axiosInstance.get(
+         `${mostPopularUrl}${days}.json`,
+         {
+            params: {
+               ['api-key']: myKey,
+            },
+         }
+      );
+
+      return { data };
    }
 );
 
@@ -38,7 +62,7 @@ const getArticleSlice = createSlice<DefaultStateType, any, any>({
       },
       webViewUrl: '',
       searchOption: 'title',
-      newsDesk: [],
+      mostViews: [],
    },
 
    reducers: {
@@ -68,6 +92,20 @@ const getArticleSlice = createSlice<DefaultStateType, any, any>({
          }
       });
       builder.addCase(getArticlesAsync.rejected, (state) => {
+         state.apiState = 'rejected';
+      });
+      // 모으트 뷰스
+      builder.addCase(getMostViewArticlesAsync.pending, (state) => {
+         state.apiState = 'pending';
+      });
+      builder.addCase(
+         getMostViewArticlesAsync.fulfilled,
+         (state, action) => {
+            state.apiState = 'fulfilled';
+            state.mostViews = action.payload.data.results;
+         }
+      );
+      builder.addCase(getMostViewArticlesAsync.rejected, (state) => {
          state.apiState = 'rejected';
       });
    },

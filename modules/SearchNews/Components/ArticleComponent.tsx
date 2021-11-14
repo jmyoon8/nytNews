@@ -94,13 +94,9 @@ const ArticleComponent = (props: any) => {
    }, [_id]);
    const dispatch = useDispatch();
    return (
-      <TouchableOpacity style={styles.articleContainer}>
+      <View style={styles.articleContainer}>
          <View style={styles.articleBox}>
-            <Text
-               onPress={() => dispatch(setWebViewUrl(web_url))}
-               numberOfLines={1}
-               style={styles.headerLineText}
-            >
+            <Text numberOfLines={1} style={styles.headerLineText}>
                {headline.print_headline || headline.main}
             </Text>
             <Text style={styles.snippetText} numberOfLines={2}>
@@ -127,7 +123,7 @@ const ArticleComponent = (props: any) => {
                </View>
             </View>
          </View>
-      </TouchableOpacity>
+      </View>
    );
 };
 

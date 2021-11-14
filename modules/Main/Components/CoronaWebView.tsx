@@ -9,6 +9,7 @@ const styles = StyleSheet.create({
 });
 const CoronaWebView = () => {
    const [isWebViewLoading, setIsWebViewLoading] = useState(false);
+
    return (
       <View style={styles.minHeight100}>
          {isWebViewLoading && <Text>로딩중...</Text>}

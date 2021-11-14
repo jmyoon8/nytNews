@@ -3,3 +3,4 @@ export const CFFF = '#fff';
 export const C000 = '#000000';
 export const Ca1a1a1 = '#a1a1a1';
 export const Ceae649 = '#eae649';
+export const C008E9B = '#008E9B';

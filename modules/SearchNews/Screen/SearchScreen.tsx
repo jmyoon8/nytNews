@@ -94,7 +94,7 @@ const SearchScreen = () => {
                setIsRecentlyItemVisible(false);
             }
          },
-         1000
+         400
       ),
       []
    );

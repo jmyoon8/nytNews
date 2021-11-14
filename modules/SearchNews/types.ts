@@ -26,6 +26,12 @@ export type ArticleType = {
    //   source: string;
    //   type_of_material: string;
 };
+export type MostViewArticleType = {
+   title: string;
+   abstract: string;
+   published_date: string;
+   url: string;
+};
 export type GetArticleData = {
    apiState: ApiState;
    result: {

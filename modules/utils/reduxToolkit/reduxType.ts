@@ -1,10 +1,19 @@
-import { ArticleType } from '../../SearchNews/types';
+import {
+   ArticleType,
+   MostViewArticleType,
+} from '../../SearchNews/types';
 
 export type GetArtibleType = {
    t: string;
    page: number;
    isInfinite: boolean;
 };
+export type GetMostViewArtibleType = {
+   days: number;
+};
+export type GetMostViedArticlesAsyncType = Promise<{
+   data: GetMostViewArticleType;
+}>;
 export type GetArticlesAsyncType = Promise<{
    data: GetArticleType;
    isInfinite: boolean;
@@ -19,12 +28,17 @@ export type DefaultStateType = {
    webViewUrl: string;
    searchOption: 'title' | 'content';
    result: GetArticleType;
-   newsDesk: ArticleType[];
+   mostViews: MostViewArticleType[];
 };
 export type GetArticleType = {
    response: {
       docs: ArticleType[];
    };
+   status: string;
+   copyright: string;
+};
+export type GetMostViewArticleType = {
+   results: MostViewArticleType[];
    status: string;
    copyright: string;
 };
