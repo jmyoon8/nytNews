@@ -46,6 +46,7 @@ const MostViewedArticle = () => {
          <View style={styles.selectDaysContainer}>
             {days.map((item) => (
                <MostViewSelectBox
+                  key={item}
                   item={item}
                   searchDays={searchDays}
                   setSearchDays={setSearchDays}
@@ -55,7 +56,7 @@ const MostViewedArticle = () => {
          {getSelector
             ?.slice(0, 6)
             .map((item: MostViewArticleType) => (
-               <MostViewList {...item} />
+               <MostViewList key={item.url} {...item} />
             ))}
          <ArticleWebViewModal />
       </View>

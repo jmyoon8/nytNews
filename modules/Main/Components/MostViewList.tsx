@@ -43,7 +43,6 @@ const MostViewList = ({
    title,
    url,
 }: MostViewListProps) => {
-   console.log(abstract, published_date, title, url);
    const dispatch = useDispatch();
    return (
       <View style={styles.articleContainer}>
