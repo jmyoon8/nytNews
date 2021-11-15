@@ -28,6 +28,7 @@ const ArticleList = ({
    const infiniteScrollHandler = () => {
       setPage((prev) => {
          let maxPage = 0;
+         // 내가 저장한 뉴스에선 clipsLength을 넘겨준다.
          if (clipsLength) {
             maxPage = Math.floor(clipsLength / 10);
             if (clipsLength % 10 > 0) {

@@ -15,6 +15,11 @@ const styles = StyleSheet.create({
       justifyContent: 'space-between',
       alignSelf: 'center',
    },
+   pageHandlerButton: {
+      width: 20,
+      height: 20,
+      alignItems: 'center',
+   },
 });
 
 const NewsDeskCategoryPageNation = ({
@@ -25,11 +30,7 @@ const NewsDeskCategoryPageNation = ({
    return (
       <View style={styles.pagenation}>
          <TouchableOpacity
-            style={{
-               width: 20,
-               height: 20,
-               alignItems: 'center',
-            }}
+            style={styles.pageHandlerButton}
             onPress={() => pageNationHandler('forward')}
          >
             <Text>{'<'}</Text>
@@ -38,11 +39,7 @@ const NewsDeskCategoryPageNation = ({
             {currentPage + 1} / {maxPage}
          </Text>
          <TouchableOpacity
-            style={{
-               width: 20,
-               height: 20,
-               alignItems: 'center',
-            }}
+            style={styles.pageHandlerButton}
             onPress={() => pageNationHandler('back')}
          >
             <Text>{'>'}</Text>
