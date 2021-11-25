@@ -59,7 +59,7 @@ const ArticleList = ({
             if (
                getSeletor.searchOption === 'title'
                   ? keyWord &&
-                    item.headline.print_headline?.includes(keyWord)
+                    item.headline.print_headline?.includes(keyWord) // 헤드라인이 없는 경우 메인에서 찾아야한다 이부분을 간과함
                   : keyWord && item.snippet.includes(keyWord)
             ) {
                console.log(item.headline.print_headline);
